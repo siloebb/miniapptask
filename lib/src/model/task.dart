@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 enum ColoredTag {
@@ -17,7 +18,7 @@ enum ColoredTag {
   }
 }
 
-class Task {
+class Task extends Equatable {
   final String id;
   final String title;
   final bool isFavorite;
@@ -65,4 +66,7 @@ class Task {
       timestamp: timestamp ?? this.timestamp,
     );
   } 
+
+  @override
+  List<Object?> get props => [id, title, isFavorite, tag, timestamp];
 }

@@ -11,7 +11,8 @@ class TaskCubit extends Cubit<TaskState> {
   final TaskRepositoryRemote remoteRepository;
   final List<Task> _tasks = [];
 
-  TaskCubit(this.localRepository, this.remoteRepository) : super(const TaskState()) {
+  TaskCubit(this.localRepository, this.remoteRepository)
+    : super(const TaskState()) {
     loadTasks();
   }
 
@@ -20,12 +21,16 @@ class TaskCubit extends Cubit<TaskState> {
     emit(state.copyWith(isLoading: true));
     final tasks = await remoteRepository.loadTasks(lastIndex: _tasks.length);
     _tasks.addAll(tasks);
-    emit(state.copyWith(tasks: _tasks, isLoading: false));
+    emit(TaskState(tasks: _tasks, isLoading: false));
   }
 
   Future<void> toggleTask(String id) async {
     final isFavorite = await localRepository.toggleFavorite(id);
-    
-    await loadTasks();
+    final index = _tasks.indexWhere((task) => task.id == id);
+    if (index != -1) {
+      final task = _tasks[index];
+      _tasks[index] = task.copyWith(isFavorite: isFavorite);
+    }
+    emit(TaskState(tasks: _tasks, isLoading: false));
   }
 }

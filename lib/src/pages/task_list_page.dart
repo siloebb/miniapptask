@@ -25,11 +25,18 @@ class _TaskListPageState extends State<TaskListPage> {
     });
   }
 
+  checkNewFavorites(List prev, List next) {
+    final prevFavs = prev.where((task) => task.isFavorite).toList();
+    final nextFavs = next.where((task) => task.isFavorite).toList();
+    return nextFavs.length > prevFavs.length;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: BlocBuilder<TaskCubit, TaskState>(
+          buildWhen: (prev, next) => checkNewFavorites(prev.tasks, next.tasks),
           builder: (context, state) {
             return Text(
               'Tasks (${state.tasks.where((task) => task.isFavorite).length})',
@@ -38,8 +45,6 @@ class _TaskListPageState extends State<TaskListPage> {
         ),
       ),
       body: BlocBuilder<TaskCubit, TaskState>(
-        buildWhen:
-            (previous, current) => previous.isLoading != current.isLoading,
         builder: (context, state) {
           if (state.isLoading && state.tasks.isEmpty) {
             return const Center(child: CircularProgressIndicator());
